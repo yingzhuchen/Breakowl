@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="assets/Breakowl-logo.png" alt="Breakowl" height="320" />
-</p>
+
 
 <h1 align="center">Breakowl</h1>
 
@@ -9,13 +7,6 @@
   Discovers breaking upgrades, explains exactly what failed, and tells you how to fix it.
 </p>
 
----
-
-<p align="center">
-  <img src="assets/pr-comment-preview.svg" alt="Breakowl PR comment example" width="820" />
-</p>
-
----
 
 ## What It Does
 
