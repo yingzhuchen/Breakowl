@@ -1,31 +1,25 @@
 <p align="center">
-  <img src="assets/migratowl-logo.png" alt="Migratowl" height="320" />
+  <img src="assets/Breakowl-logo.png" alt="Breakowl" height="320" />
 </p>
 
-<h1 align="center">Migratowl</h1>
+<h1 align="center">Breakowl</h1>
 
 <p align="center">
   <strong>AI-powered dependency migration analyzer.</strong><br>
   Discovers breaking upgrades, explains exactly what failed, and tells you how to fix it.
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/python-3.13%2B-blue" alt="Python 3.13+" />
-  <img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License" />
-  <a href="https://www.bestpractices.dev/projects/12571"><img src="https://www.bestpractices.dev/projects/12571/badge" alt="OpenSSF Best Practices"></a>
-</p>
-
 ---
 
 <p align="center">
-  <img src="assets/pr-comment-preview.svg" alt="Migratowl PR comment example" width="820" />
+  <img src="assets/pr-comment-preview.svg" alt="Breakowl PR comment example" width="820" />
 </p>
 
 ---
 
 ## What It Does
 
-Migratowl answers one question: **"If I upgrade this dependency, will anything break — and how do I fix it?"**
+Breakowl answers one question: **"If I upgrade this dependency, will anything break — and how do I fix it?"**
 
 It receives a webhook, clones the target repository, scans all dependency manifests, queries package registries for newer versions, and runs the project inside an isolated Kubernetes sandbox with every dependency bumped. An AI agent executes the test suite, reads the error output, fetches the relevant changelog, and produces a structured report per dependency.
 
@@ -47,7 +41,7 @@ It tells you *that* something changed. It does not tell you *which of your files
 the removed API, or whether your project even calls the affected code path.
 
 **"I just let CI run on the Dependabot PR."**
-CI tells you it failed. Migratowl tells you *why*, links it to a specific changelog entry,
+CI tells you it failed. Breakowl tells you *why*, links it to a specific changelog entry,
 and scores how confident it is in that attribution — for every package in the PR, not just
 the one that happened to fail loudest.
 
@@ -62,7 +56,7 @@ tests needed. For interpreted languages (Python, Node.js), a test suite is curre
 required to detect runtime breakage. Zero-test support for interpreted ecosystems is
 planned.
 
-| | Snyk | SonarQube | Dependabot | Renovate | Your CI | Migratowl |
+| | Snyk | SonarQube | Dependabot | Renovate | Your CI | Breakowl |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: |
 | Security CVE alerts | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ❌ |
 | License compliance | ⚠️ | ✅ | ❌ | ❌ | ❌ | ❌ |
@@ -104,7 +98,7 @@ planned.
 - [Observability](#observability-1)
 - [GitHub Actions](#github-actions)
   - [Option A — No server needed (`ci-only.yml`)](#option-a--no-server-needed-ci-onlyyml)
-  - [Option B — Persistent Migratowl server (`with-migratowl-server.yml`)](#option-b--persistent-migratowl-server-with-migratowl-serveryml)
+  - [Option B — Persistent Breakowl server (`with-Breakowl-server.yml`)](#option-b--persistent-Breakowl-server-with-Breakowl-serveryml)
 - [Architecture](#architecture)
 - [Project Layout](#project-layout)
 - [Development](#development)
@@ -119,17 +113,17 @@ Choose the path that matches your setup:
 
 ### Zero-config (no cluster needed)
 
-For individual developers and small teams with no existing Kubernetes infrastructure. Migratowl spins up a temporary cluster inside the CI runner — nothing to install or host.
+For individual developers and small teams with no existing Kubernetes infrastructure. Breakowl spins up a temporary cluster inside the CI runner — nothing to install or host.
 
 **GitHub Actions** — add one workflow file and one secret:
 
 ```yaml
-name: migratowl
+name: Breakowl
 on:
   pull_request:
     branches: [main]
 concurrency:
-  group: migratowl-${{ github.ref }}
+  group: Breakowl-${{ github.ref }}
   cancel-in-progress: true
 permissions:
   contents: read
@@ -139,29 +133,29 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: bitkaio/migratowl-action@v1
+      - uses: bitkaio/Breakowl-action@v1
         with:
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
-See [bitkaio/migratowl-action](https://github.com/bitkaio/migratowl-action) for the full inputs reference, scheduled mode, and GitLab usage.
+See [bitkaio/Breakowl-action](https://github.com/bitkaio/Breakowl-action) for the full inputs reference, scheduled mode, and GitLab usage.
 
 **GitLab CI** — include the component once:
 
 ```yaml
 stages: [test]
 include:
-  - component: gitlab.com/bitkaio/migratowl/migratowl-gitlab-component/scan@v1
+  - component: gitlab.com/bitkaio/Breakowl/Breakowl-gitlab-component/scan@v1
     inputs:
       anthropic-api-key: $ANTHROPIC_API_KEY
       stage: test
 ```
 
-See [bitkaio/migratowl/migratowl-gitlab-component](https://gitlab.com/bitkaio/migratowl/migratowl-gitlab-component) for details.
+See [bitkaio/Breakowl/Breakowl-gitlab-component](https://gitlab.com/bitkaio/Breakowl/Breakowl-gitlab-component) for details.
 
 ### Self-hosted (existing Kubernetes cluster)
 
-For teams that already operate a Kubernetes cluster and want a persistent Migratowl deployment. Follow the [Self-Hosted Quick Start](#self-hosted-quick-start) below.
+For teams that already operate a Kubernetes cluster and want a persistent Breakowl deployment. Follow the [Self-Hosted Quick Start](#self-hosted-quick-start) below.
 
 ---
 
@@ -181,8 +175,8 @@ When a lockfile sits next to a manifest (or in a parent directory, as in Cargo a
 
 ## How It Works
 
-Migratowl runs inside an ephemeral Kubernetes sandbox. Phases 1–2 are mechanical and run as
-plain code (`migratowl/pipeline.py`); the LLM only does the judgement step (Phase 3), and the
+Breakowl runs inside an ephemeral Kubernetes sandbox. Phases 1–2 are mechanical and run as
+plain code (`Breakowl/pipeline.py`); the LLM only does the judgement step (Phase 3), and the
 final report is assembled in code. This keeps the model's context small, so smaller and free
 models can run scans too.
 
@@ -226,16 +220,16 @@ flowchart TB
 - Import or attribute error for a known package API → attributed directly
 - Ambiguous failure with no clear link to a specific package → delegated to an isolated package-analyzer subagent run
 
-The attribution threshold is configurable via `MIGRATOWL_CONFIDENCE_THRESHOLD` (default `0.7`).
+The attribution threshold is configurable via `Breakowl_CONFIDENCE_THRESHOLD` (default `0.7`).
 
-**Code evidence (static analysis, before the model runs):** Migratowl parses `source/` inside the sandbox with [ast-grep](https://ast-grep.github.io/) (the code is parsed, never run) and reports for each package under analysis:
+**Code evidence (static analysis, before the model runs):** Breakowl parses `source/` inside the sandbox with [ast-grep](https://ast-grep.github.io/) (the code is parsed, never run) and reports for each package under analysis:
 
 - which files import it, and whether any test reaches it (directly, or through local imports for Python and JavaScript/TypeScript; by package for Go);
 - where its breaking changes appear in the code: curated rules for well-known majors (Express 5, pydantic 2, NumPy 2) plus call patterns taken from the changelog excerpt (`res.json(status, obj)` → any `x.json(a, b)` call).
 
 The evidence goes into the model's brief, and code (not the model) checks every "safe" verdict against it. A package is marked **🔍 Review** in the PR comment when a breaking pattern was found in the code, or when a major upgrade was judged safe with no changelog evidence on tests that never reach it. Review does not fail the commit status; breaking verdicts do.
 
-**Choosing a model:** the default `claude-sonnet-5-5` gives the most precise verdicts; a scan of a small project costs about $0.01–0.15. `claude-haiku-5-5` was as accurate on our test projects for about a twelfth of the cost, which suits frequent scans. Free or small models are fine for trying Migratowl out, but they raise more Review flags and miss more; the code evidence and Review flags limit the damage, and `MIGRATOWL_MAX_MODEL_CALLS` limits the cost. Measured cost, time and accuracy per model: [`docs/model-benchmarks.md`](docs/model-benchmarks.md).
+**Choosing a model:** the default `claude-sonnet-5-5` gives the most precise verdicts; a scan of a small project costs about $0.01–0.15. `claude-haiku-5-5` was as accurate on our test projects for about a twelfth of the cost, which suits frequent scans. Free or small models are fine for trying Breakowl out, but they raise more Review flags and miss more; the code evidence and Review flags limit the damage, and `Breakowl_MAX_MODEL_CALLS` limits the cost. Measured cost, time and accuracy per model: [`docs/model-benchmarks.md`](docs/model-benchmarks.md).
 
 **Sandbox workspace layout:**
 
@@ -244,7 +238,7 @@ The evidence goes into the model's brief, and code (not the model) checks every 
 ├── source/          # Immutable clone — never executed
 ├── main/            # All deps bumped, executed in Phase 2
 ├── <package-name>/  # Per-package isolation (created on demand by subagent)
-├── .migratowl-evidence/ # The ast-grep scanner and its request
+├── .Breakowl-evidence/ # The ast-grep scanner and its request
 └── .venvs/<folder>/ # One Python venv per working folder (Python projects only)
 ```
 
@@ -278,7 +272,7 @@ kubectl apply -f k8s/rbac.yaml
 kubectl apply -f k8s/sandbox-template.yaml
 
 # 7. Start the server
-uv run uvicorn migratowl.api.main:app --reload
+uv run uvicorn Breakowl.api.main:app --reload
 ```
 
 Trigger a scan:
@@ -299,7 +293,7 @@ curl -X POST http://localhost:8000/webhook \
 
 ### POST /webhook
 
-Accepts a scan request. Returns `202 Accepted` immediately; analysis runs in the background and POSTs the outcome (report or failure) to `callback_url` when done. When `MIGRATOWL_API_TOKEN` is set, send `Authorization: Bearer <token>` with this and every `/jobs` request.
+Accepts a scan request. Returns `202 Accepted` immediately; analysis runs in the background and POSTs the outcome (report or failure) to `callback_url` when done. When `Breakowl_API_TOKEN` is set, send `Authorization: Bearer <token>` with this and every `/jobs` request.
 
 **Request body** (`ScanWebhookPayload`):
 
@@ -308,10 +302,10 @@ Accepts a scan request. Returns `202 Accepted` immediately; analysis runs in the
 | `repo_url` | `string` | **required** | Git repository URL to scan |
 | `branch_name` | `string` | `"main"` | Branch to clone and analyze |
 | `git_provider` | `"github" \| "gitlab"` | `"github"` | Git provider — determines which API is used for PR/MR comments and commit statuses |
-| `pr_number` | `integer \| null` | `null` | PR (GitHub) or MR IID (GitLab) — when set, Migratowl posts a comment with the analysis result, or a short failure notice if the scan fails |
-| `commit_sha` | `string \| null` | `null` | Full commit SHA — when set (with or without `pr_number`), Migratowl posts a pending status at scan start and a success/failure/error status at the end |
+| `pr_number` | `integer \| null` | `null` | PR (GitHub) or MR IID (GitLab) — when set, Breakowl posts a comment with the analysis result, or a short failure notice if the scan fails |
+| `commit_sha` | `string \| null` | `null` | Full commit SHA — when set (with or without `pr_number`), Breakowl posts a pending status at scan start and a success/failure/error status at the end |
 | `fail_on_breaking` | `bool` | `true` | When a breaking upgrade is found, set the final commit status to failure (`true`) or keep it successful with the count in its description (`false`). On GitLab a failed status fails the MR pipeline |
-| `callback_url` | `string \| null` | `null` | URL to POST the outcome to: the `ScanAnalysisReport` when the scan completes, or `{job_id, state: "failed", error, repo_url, branch_name}` when it fails. Both requests carry `X-Migratowl-Job-Id` and `X-Migratowl-Job-State` headers |
+| `callback_url` | `string \| null` | `null` | URL to POST the outcome to: the `ScanAnalysisReport` when the scan completes, or `{job_id, state: "failed", error, repo_url, branch_name}` when it fails. Both requests carry `X-Breakowl-Job-Id` and `X-Breakowl-Job-State` headers |
 | `exclude_deps` | `string[]` | `[]` | Dependency names to skip entirely |
 | `check_deps` | `string[]` | `[]` | When non-empty, only these dependencies are checked (all others are ignored) |
 | `max_deps` | `integer` | `50` | Maximum outdated deps to analyze (must be > 0) |
@@ -393,7 +387,7 @@ stateDiagram-v2
 
 | State | Meaning |
 |-------|---------|
-| `pending` | Queued, not yet started (at most `MIGRATOWL_MAX_CONCURRENT_SCANS` scans run at once) |
+| `pending` | Queued, not yet started (at most `Breakowl_MAX_CONCURRENT_SCANS` scans run at once) |
 | `running` | Agent is actively analyzing the repository |
 | `completed` | Analysis finished; `result` is populated |
 | `failed` | Unrecoverable error; `error` describes what went wrong |
@@ -415,7 +409,7 @@ List jobs in one state, for example `?state=interrupted` to find work a restart 
 
 Resume an `interrupted` job. Returns `202` with the same body as `POST /webhook`. With the default `sqlite` persistence the scan reconnects to its surviving sandbox and continues from the last LangGraph checkpoint; if the sandbox is gone, it starts over from the clone. PR comments and callbacks are not sent twice.
 
-**404** when `job_id` is not found; **409** when the job is not `interrupted` (or another resume already claimed it) or has been resumed more than `MIGRATOWL_MAX_SCAN_RETRIES` times.
+**404** when `job_id` is not found; **409** when the job is not `interrupted` (or another resume already claimed it) or has been resumed more than `Breakowl_MAX_SCAN_RETRIES` times.
 
 ---
 
@@ -477,8 +471,8 @@ ScanAnalysisReport
 ├── presolved                 string[]  — packages settled in code, without the LLM
 ├── delegated                 string[]  — packages the agent sent to the package-analyzer subagent
 ├── phase_seconds             object    — seconds per phase: prepare, evidence, analysis, compile
-├── migratowl_version         string    — server version (plus +g<commit> when run from a git checkout)
-└── analysis_brief            string    — the LLM's brief; "" unless MIGRATOWL_RECORD_ANALYSIS_BRIEF=true
+├── Breakowl_version         string    — server version (plus +g<commit> when run from a git checkout)
+└── analysis_brief            string    — the LLM's brief; "" unless Breakowl_RECORD_ANALYSIS_BRIEF=true
 ```
 
 **Example report entry:**
@@ -498,21 +492,21 @@ ScanAnalysisReport
 
 ## Configuration
 
-All `MIGRATOWL_*` variables are optional (defaults shown). Third-party SDK keys use their standard names without the `MIGRATOWL_` prefix.
+All `Breakowl_*` variables are optional (defaults shown). Third-party SDK keys use their standard names without the `Breakowl_` prefix.
 
 ### LLM
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ANTHROPIC_API_KEY` | — | Required when `MIGRATOWL_MODEL_PROVIDER=anthropic` (default) |
-| `OPENAI_API_KEY` | — | Required when `MIGRATOWL_MODEL_PROVIDER=openai` or `litellm` |
-| `MIGRATOWL_MODEL_PROVIDER` | `anthropic` | LLM provider: `anthropic`, `openai`, or `litellm` |
-| `MIGRATOWL_MODEL_NAME` | `claude-sonnet-5-5` | Model name (must match provider) |
-| `MIGRATOWL_MODEL_ALIAS` | — | Override model name sent to provider (for proxies with different naming) |
-| `MIGRATOWL_MODEL_RATE_LIMIT_RPS` | `0.1` | Max LLM requests/second (0.1 = 6 req/min) |
-| `ANTHROPIC_BASE_URL` | — | Custom base URL for Anthropic API (`MIGRATOWL_ANTHROPIC_BASE_URL` also works) |
-| `OPENAI_BASE_URL` | — | Custom base URL for OpenAI API (`MIGRATOWL_OPENAI_BASE_URL` also works) |
-| `LITELLM_BASE_URL` | — | LiteLLM unified proxy endpoint (use with `MIGRATOWL_MODEL_PROVIDER=litellm`; `MIGRATOWL_LITELLM_BASE_URL` also works) |
+| `ANTHROPIC_API_KEY` | — | Required when `Breakowl_MODEL_PROVIDER=anthropic` (default) |
+| `OPENAI_API_KEY` | — | Required when `Breakowl_MODEL_PROVIDER=openai` or `litellm` |
+| `Breakowl_MODEL_PROVIDER` | `anthropic` | LLM provider: `anthropic`, `openai`, or `litellm` |
+| `Breakowl_MODEL_NAME` | `claude-sonnet-5-5` | Model name (must match provider) |
+| `Breakowl_MODEL_ALIAS` | — | Override model name sent to provider (for proxies with different naming) |
+| `Breakowl_MODEL_RATE_LIMIT_RPS` | `0.1` | Max LLM requests/second (0.1 = 6 req/min) |
+| `ANTHROPIC_BASE_URL` | — | Custom base URL for Anthropic API (`Breakowl_ANTHROPIC_BASE_URL` also works) |
+| `OPENAI_BASE_URL` | — | Custom base URL for OpenAI API (`Breakowl_OPENAI_BASE_URL` also works) |
+| `LITELLM_BASE_URL` | — | LiteLLM unified proxy endpoint (use with `Breakowl_MODEL_PROVIDER=litellm`; `Breakowl_LITELLM_BASE_URL` also works) |
 
 #### Using an LLM Proxy
 
@@ -523,16 +517,16 @@ For developers routing through corporate proxies (LiteLLM, Azure API Management,
 ```bash
 ANTHROPIC_BASE_URL=https://proxy.mycompany.com/anthropic/v1
 ANTHROPIC_API_KEY=<proxy-provided-key>
-MIGRATOWL_MODEL_ALIAS=anthropic--claude-sonnet-latest  # if proxy uses different naming
+Breakowl_MODEL_ALIAS=anthropic--claude-sonnet-latest  # if proxy uses different naming
 ```
 
 **Pattern 2 — LiteLLM unified proxy** (one endpoint for all providers):
 
 ```bash
-MIGRATOWL_MODEL_PROVIDER=litellm
+Breakowl_MODEL_PROVIDER=litellm
 LITELLM_BASE_URL=https://proxy.mycompany.com/v1
 OPENAI_API_KEY=<proxy-provided-key>
-MIGRATOWL_MODEL_NAME=anthropic--claude-sonnet-latest
+Breakowl_MODEL_NAME=anthropic--claude-sonnet-latest
 ```
 
 See [`docs/proxy-setup.md`](docs/proxy-setup.md) for troubleshooting, model name mapping, and additional examples.
@@ -541,61 +535,61 @@ See [`docs/proxy-setup.md`](docs/proxy-setup.md) for troubleshooting, model name
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MIGRATOWL_SANDBOX_MODE` | `agent-sandbox` | `agent-sandbox` (requires controller + CRDs) or `raw` (any cluster, no CRDs) |
-| `MIGRATOWL_SANDBOX_TEMPLATE` | `migratowl-sandbox-template` | agent-sandbox `AgentSandboxTemplate` name (agent-sandbox mode only) |
-| `MIGRATOWL_SANDBOX_NAMESPACE` | `default` | Kubernetes namespace for sandbox pods |
-| `MIGRATOWL_SANDBOX_CONNECTION_MODE` | `tunnel` | Connection mode: `tunnel` (needs `kubectl` on the server's host) or `direct` (agent-sandbox mode only; use it when the server runs inside the cluster) |
-| `MIGRATOWL_SANDBOX_API_URL` | — | Sandbox-router URL, required with `direct`: `http://sandbox-router-svc.<namespace>.svc.cluster.local:8080` |
-| `MIGRATOWL_SANDBOX_KUBE_API_URL` | in-cluster URL | Kubernetes API used to list and delete SandboxClaims (agent-sandbox mode only). Off-cluster, run `kubectl proxy` and set `http://localhost:8001`; otherwise TTL sweep and shutdown cleanup can't run |
-| `MIGRATOWL_SANDBOX_KUBE_TOKEN` | — | Bearer token for `MIGRATOWL_SANDBOX_KUBE_API_URL` (not needed with `kubectl proxy` or in-cluster) |
-| `MIGRATOWL_SANDBOX_IMAGE` | `ghcr.io/bitkaio/migratowl-runtime:latest` | Container image for sandbox pods (raw mode only). The default bundles git and every supported toolchain (built from `k8s/runtime/`). A custom image must include `git`, `python3` and the toolchains for the ecosystems you scan — slim language images such as `python:3.13-slim` have no `git`, so the clone fails. |
-| `MIGRATOWL_SANDBOX_PYTHON_VERSION` | `3.13` | Python version in the sandbox image. PyPI releases whose `requires_python` excludes it are not suggested as upgrades (they could not be installed). Change it if you use a custom image with another Python |
-| `MIGRATOWL_SANDBOX_BLOCK_NETWORK` | `true` | Attach deny-all `NetworkPolicy` to sandbox pods (raw mode only; requires Calico/Cilium — kindnet ignores it). Apply `k8s/sandbox-egress-raw.yaml` so scans can still reach DNS, git hosts and registries |
-| `MIGRATOWL_WORKSPACE_PATH` | `/home/user/workspace` | Workspace root inside the sandbox |
+| `Breakowl_SANDBOX_MODE` | `agent-sandbox` | `agent-sandbox` (requires controller + CRDs) or `raw` (any cluster, no CRDs) |
+| `Breakowl_SANDBOX_TEMPLATE` | `Breakowl-sandbox-template` | agent-sandbox `AgentSandboxTemplate` name (agent-sandbox mode only) |
+| `Breakowl_SANDBOX_NAMESPACE` | `default` | Kubernetes namespace for sandbox pods |
+| `Breakowl_SANDBOX_CONNECTION_MODE` | `tunnel` | Connection mode: `tunnel` (needs `kubectl` on the server's host) or `direct` (agent-sandbox mode only; use it when the server runs inside the cluster) |
+| `Breakowl_SANDBOX_API_URL` | — | Sandbox-router URL, required with `direct`: `http://sandbox-router-svc.<namespace>.svc.cluster.local:8080` |
+| `Breakowl_SANDBOX_KUBE_API_URL` | in-cluster URL | Kubernetes API used to list and delete SandboxClaims (agent-sandbox mode only). Off-cluster, run `kubectl proxy` and set `http://localhost:8001`; otherwise TTL sweep and shutdown cleanup can't run |
+| `Breakowl_SANDBOX_KUBE_TOKEN` | — | Bearer token for `Breakowl_SANDBOX_KUBE_API_URL` (not needed with `kubectl proxy` or in-cluster) |
+| `Breakowl_SANDBOX_IMAGE` | `ghcr.io/bitkaio/Breakowl-runtime:latest` | Container image for sandbox pods (raw mode only). The default bundles git and every supported toolchain (built from `k8s/runtime/`). A custom image must include `git`, `python3` and the toolchains for the ecosystems you scan — slim language images such as `python:3.13-slim` have no `git`, so the clone fails. |
+| `Breakowl_SANDBOX_PYTHON_VERSION` | `3.13` | Python version in the sandbox image. PyPI releases whose `requires_python` excludes it are not suggested as upgrades (they could not be installed). Change it if you use a custom image with another Python |
+| `Breakowl_SANDBOX_BLOCK_NETWORK` | `true` | Attach deny-all `NetworkPolicy` to sandbox pods (raw mode only; requires Calico/Cilium — kindnet ignores it). Apply `k8s/sandbox-egress-raw.yaml` so scans can still reach DNS, git hosts and registries |
+| `Breakowl_WORKSPACE_PATH` | `/home/user/workspace` | Workspace root inside the sandbox |
 
 ### Analysis
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MIGRATOWL_CONFIDENCE_THRESHOLD` | `0.7` | Packages above this are analyzed directly; below → subagent |
-| `MIGRATOWL_SCAN_REGISTRY_CONCURRENCY` | `10` | Concurrent registry queries when checking outdated deps |
-| `MIGRATOWL_MAX_OUTPUT_CHARS` | `30000` | Truncation limit for sandbox command output |
-| `MIGRATOWL_ANALYSIS_TAIL_CHARS` | `4000` | Characters of failing build/test output (the tail) included in the LLM's analysis brief |
-| `MIGRATOWL_RECORD_ANALYSIS_BRIEF` | `false` | Keep the LLM's analysis brief on the job result (`analysis_brief` in `GET /jobs/{id}`) for offline evaluation. It holds build/test output and changelog excerpts, so it is off by default; it is never sent to the callback or the PR comment |
-| `MIGRATOWL_MAX_CHANGELOG_CHARS` | `15000` | Truncation limit for fetched changelogs |
-| `MIGRATOWL_MAX_OUTDATED_DEPS` | `100` | Hard cap on registry scan results |
-| `MIGRATOWL_MAX_MODEL_CALLS` | `60` | Ceiling on the model calls the analysis agent may make in one scan; the run then ends gracefully. Each scan sizes its cap below this: 6 calls plus 3 per package left to analyse (5 when its ecosystem's upgraded tests failed). Packages left without a verdict are reported as skipped, never as safe. `0` = no limit |
-| `MIGRATOWL_MAX_SUBAGENT_MODEL_CALLS` | `20` | Ceiling on each package-analyzer subagent run. Sized per scan: 6 calls plus 1 per 5 files importing the most-used package (the ceiling when that is unknown). `0` = no limit |
-| `MIGRATOWL_CONTEXT_TRIM_TOKENS` | `40000` | Once the agent's context passes this many tokens, older tool outputs are replaced with a placeholder (the last 3 are kept). `0` = never trim |
+| `Breakowl_CONFIDENCE_THRESHOLD` | `0.7` | Packages above this are analyzed directly; below → subagent |
+| `Breakowl_SCAN_REGISTRY_CONCURRENCY` | `10` | Concurrent registry queries when checking outdated deps |
+| `Breakowl_MAX_OUTPUT_CHARS` | `30000` | Truncation limit for sandbox command output |
+| `Breakowl_ANALYSIS_TAIL_CHARS` | `4000` | Characters of failing build/test output (the tail) included in the LLM's analysis brief |
+| `Breakowl_RECORD_ANALYSIS_BRIEF` | `false` | Keep the LLM's analysis brief on the job result (`analysis_brief` in `GET /jobs/{id}`) for offline evaluation. It holds build/test output and changelog excerpts, so it is off by default; it is never sent to the callback or the PR comment |
+| `Breakowl_MAX_CHANGELOG_CHARS` | `15000` | Truncation limit for fetched changelogs |
+| `Breakowl_MAX_OUTDATED_DEPS` | `100` | Hard cap on registry scan results |
+| `Breakowl_MAX_MODEL_CALLS` | `60` | Ceiling on the model calls the analysis agent may make in one scan; the run then ends gracefully. Each scan sizes its cap below this: 6 calls plus 3 per package left to analyse (5 when its ecosystem's upgraded tests failed). Packages left without a verdict are reported as skipped, never as safe. `0` = no limit |
+| `Breakowl_MAX_SUBAGENT_MODEL_CALLS` | `20` | Ceiling on each package-analyzer subagent run. Sized per scan: 6 calls plus 1 per 5 files importing the most-used package (the ceiling when that is unknown). `0` = no limit |
+| `Breakowl_CONTEXT_TRIM_TOKENS` | `40000` | Once the agent's context passes this many tokens, older tool outputs are replaced with a placeholder (the last 3 are kept). `0` = never trim |
 
 ### Jobs and Crash Recovery
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MIGRATOWL_PERSISTENCE_BACKEND` | `sqlite` | `sqlite` keeps jobs and agent checkpoints on disk so scans survive a restart and can be resumed; `memory` keeps nothing (CI, one-shot runs) |
-| `MIGRATOWL_JOBS_DB_PATH` | `./migratowl_jobs.db` | SQLite job store (`sqlite` backend only) |
-| `MIGRATOWL_CHECKPOINT_DB_PATH` | `./migratowl_checkpoints.db` | SQLite LangGraph checkpoints (`sqlite` backend only) |
-| `MIGRATOWL_MAX_SCAN_RETRIES` | `3` | How often a job may be resumed; past it, an interrupted job is marked `failed` |
-| `MIGRATOWL_MAX_CONCURRENT_SCANS` | `1` | Scans that run at once; the rest wait as `pending`. Each scan has its own sandbox pod, so this bounds cluster and LLM load |
-| `MIGRATOWL_SANDBOX_TTL_IDLE_SECONDS` | `1800` | Sandboxes idle for longer are deleted by the startup sweep (leaked by a crash) |
-| `MIGRATOWL_SANDBOX_TTL_SECONDS` | — | Absolute sandbox lifetime. Unset by default so long builds are not killed mid-scan |
+| `Breakowl_PERSISTENCE_BACKEND` | `sqlite` | `sqlite` keeps jobs and agent checkpoints on disk so scans survive a restart and can be resumed; `memory` keeps nothing (CI, one-shot runs) |
+| `Breakowl_JOBS_DB_PATH` | `./Breakowl_jobs.db` | SQLite job store (`sqlite` backend only) |
+| `Breakowl_CHECKPOINT_DB_PATH` | `./Breakowl_checkpoints.db` | SQLite LangGraph checkpoints (`sqlite` backend only) |
+| `Breakowl_MAX_SCAN_RETRIES` | `3` | How often a job may be resumed; past it, an interrupted job is marked `failed` |
+| `Breakowl_MAX_CONCURRENT_SCANS` | `1` | Scans that run at once; the rest wait as `pending`. Each scan has its own sandbox pod, so this bounds cluster and LLM load |
+| `Breakowl_SANDBOX_TTL_IDLE_SECONDS` | `1800` | Sandboxes idle for longer are deleted by the startup sweep (leaked by a crash) |
+| `Breakowl_SANDBOX_TTL_SECONDS` | — | Absolute sandbox lifetime. Unset by default so long builds are not killed mid-scan |
 
 Run a single server process per database: on startup it marks every `pending` or `running` job it finds as `interrupted`.
 
 ### Package Registries and Mirrors
 
-By default Migratowl reads PyPI, npm, crates.io, the Go proxy and Maven Central. Behind a proxy or with private packages, point it at your own mirror (Artifactory, Nexus, devpi, Verdaccio, a Go proxy). The same setting drives the version checks and the sandbox's `pip`, `npm`, `go`, `cargo` and `mvn`, which Migratowl configures before anything installs. Each variable is optional; unset means the public registry.
+By default Breakowl reads PyPI, npm, crates.io, the Go proxy and Maven Central. Behind a proxy or with private packages, point it at your own mirror (Artifactory, Nexus, devpi, Verdaccio, a Go proxy). The same setting drives the version checks and the sandbox's `pip`, `npm`, `go`, `cargo` and `mvn`, which Breakowl configures before anything installs. Each variable is optional; unset means the public registry.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MIGRATOWL_PYPI_URL` | `https://pypi.org` | Base of the PyPI JSON API; checks read `<url>/pypi/<name>/json`, pip uses `<url>/simple` |
-| `MIGRATOWL_NPM_REGISTRY_URL` | `https://registry.npmjs.org` | npm registry (checks and installs) |
-| `MIGRATOWL_GO_PROXY_URL` | `https://proxy.golang.org` | `GOPROXY` for checks and installs. Set only the mirror: there is no `direct` fallback |
-| `MIGRATOWL_CRATES_API_URL` | `https://crates.io` | crates.io web API (version checks) |
-| `MIGRATOWL_CARGO_REGISTRY_URL` | — | Cargo index for installs, e.g. `sparse+https://crates.corp/index/`. Replaces crates.io for `cargo`; Cargo credentials are not supported |
-| `MIGRATOWL_MAVEN_URL` | — | Maven repository. Checks read `maven-metadata.xml` instead of Central's search API, and `mvn` mirrors everything (`*`) to it. Gradle ignores this |
-| `MIGRATOWL_REGISTRY_USERNAME`, `MIGRATOWL_REGISTRY_PASSWORD` | — | Basic credentials (the password may be an access token) for pip, Go, Maven and npm |
-| `MIGRATOWL_REGISTRY_TOKEN` | — | Bearer token for the version checks and npm's `_authToken` (pip, Go and Maven need the username and password) |
+| `Breakowl_PYPI_URL` | `https://pypi.org` | Base of the PyPI JSON API; checks read `<url>/pypi/<name>/json`, pip uses `<url>/simple` |
+| `Breakowl_NPM_REGISTRY_URL` | `https://registry.npmjs.org` | npm registry (checks and installs) |
+| `Breakowl_GO_PROXY_URL` | `https://proxy.golang.org` | `GOPROXY` for checks and installs. Set only the mirror: there is no `direct` fallback |
+| `Breakowl_CRATES_API_URL` | `https://crates.io` | crates.io web API (version checks) |
+| `Breakowl_CARGO_REGISTRY_URL` | — | Cargo index for installs, e.g. `sparse+https://crates.corp/index/`. Replaces crates.io for `cargo`; Cargo credentials are not supported |
+| `Breakowl_MAVEN_URL` | — | Maven repository. Checks read `maven-metadata.xml` instead of Central's search API, and `mvn` mirrors everything (`*`) to it. Gradle ignores this |
+| `Breakowl_REGISTRY_USERNAME`, `Breakowl_REGISTRY_PASSWORD` | — | Basic credentials (the password may be an access token) for pip, Go, Maven and npm |
+| `Breakowl_REGISTRY_TOKEN` | — | Bearer token for the version checks and npm's `_authToken` (pip, Go and Maven need the username and password) |
 
 Credentials are sent only to the mirror hosts, never to the public registries or to changelog sources, and reach the sandbox as uploaded config files rather than command arguments. Registry URLs must not embed credentials, and credentials require `https`.
 
@@ -605,17 +599,17 @@ Credentials are sent only to the mirror hosts, never to the public registries or
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MIGRATOWL_HTTP_TIMEOUT` | `30.0` | Outbound request timeout (seconds) |
-| `MIGRATOWL_HTTP_RETRY_COUNT` | `3` | Retries on 429 / 5xx responses |
-| `MIGRATOWL_HTTP_RETRY_BACKOFF_BASE` | `0.5` | Base delay (seconds) for exponential backoff |
+| `Breakowl_HTTP_TIMEOUT` | `30.0` | Outbound request timeout (seconds) |
+| `Breakowl_HTTP_RETRY_COUNT` | `3` | Retries on 429 / 5xx responses |
+| `Breakowl_HTTP_RETRY_BACKOFF_BASE` | `0.5` | Base delay (seconds) for exponential backoff |
 
 ### API Server
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MIGRATOWL_LOG_LEVEL` | `INFO` | Log level for Migratowl's own messages (`DEBUG`, `INFO`, `WARNING`, `ERROR`); at `INFO` each scan logs its candidates, update failures and validation result per ecosystem |
-| `MIGRATOWL_API_TOKEN` | — | When set, `POST /webhook` and all `/jobs` endpoints require `Authorization: Bearer <token>` (`/healthz` stays open). Set it whenever the server is reachable from anything but localhost; the server logs a warning at startup when it is unset |
-| `MIGRATOWL_CALLBACK_ALLOW_PRIVATE` | `false` | Allow `callback_url` to target private, loopback or link-local addresses. By default such URLs are rejected with `422`, hostnames are resolved again before the callback is sent, and redirects are not followed |
+| `Breakowl_LOG_LEVEL` | `INFO` | Log level for Breakowl's own messages (`DEBUG`, `INFO`, `WARNING`, `ERROR`); at `INFO` each scan logs its candidates, update failures and validation result per ecosystem |
+| `Breakowl_API_TOKEN` | — | When set, `POST /webhook` and all `/jobs` endpoints require `Authorization: Bearer <token>` (`/healthz` stays open). Set it whenever the server is reachable from anything but localhost; the server logs a warning at startup when it is unset |
+| `Breakowl_CALLBACK_ALLOW_PRIVATE` | `false` | Allow `callback_url` to target private, loopback or link-local addresses. By default such URLs are rejected with `422`, hostnames are resolved again before the callback is sent, and redirects are not followed |
 
 ### Git Providers
 
@@ -625,7 +619,7 @@ Credentials are sent only to the mirror hosts, never to the public registries or
 | `GITHUB_API_URL` | `https://api.github.com` | Override for GitHub Enterprise Server (e.g. `https://github.corp.com/api/v3`) |
 | `GITLAB_TOKEN` | — | GitLab personal access token with `api` scope; needed to post MR comments and commit statuses. Also used to clone private repositories on the host of `GITLAB_API_URL` |
 | `GITLAB_API_URL` | `https://gitlab.com/api/v4` | Override for self-hosted GitLab |
-| `MIGRATOWL_GITLAB_TOKEN_USER` | `oauth2` | Username sent with `GITLAB_TOKEN` when cloning: `oauth2` for personal, project and group access tokens, `gitlab-ci-token` for a CI job token |
+| `Breakowl_GITLAB_TOKEN_USER` | `oauth2` | Username sent with `GITLAB_TOKEN` when cloning: `oauth2` for personal, project and group access tokens, `gitlab-ci-token` for a CI job token |
 
 Private repositories: with the token for the repository's host set, `repo_url` needs no credentials. The token goes to `git clone` as a request header for that host only. It is not written to the clone's `.git/config`, which code in the sandbox could read, and it is not echoed in errors. Credentials embedded in `repo_url` (`https://user:token@host/…`) are handled the same way. If the host rejects the token, the clone is retried without it, so a public repository still works.
 
@@ -641,29 +635,29 @@ Private repositories: with the token for the repository's host set, `repo_url` n
 
 ## Running the Server in a Cluster
 
-The server image is `ghcr.io/bitkaio/migratowl-server` (non-root, read-only root filesystem, one process; job history in `/data`). The Helm chart in [`deploy/helm/migratowl`](deploy/helm/migratowl) runs it in the cluster it scans from, with a ServiceAccount whose Role is limited to the sandbox namespace and a volume for the SQLite job history.
+The server image is `ghcr.io/bitkaio/Breakowl-server` (non-root, read-only root filesystem, one process; job history in `/data`). The Helm chart in [`deploy/helm/Breakowl`](deploy/helm/Breakowl) runs it in the cluster it scans from, with a ServiceAccount whose Role is limited to the sandbox namespace and a volume for the SQLite job history.
 
 Set up the sandbox prerequisites first ([Kubernetes Setup](#kubernetes-setup): the agent-sandbox controller, `k8s/sandbox-template.yaml` and `k8s/sandbox-router.yaml`, or use `sandbox.mode=raw`), then:
 
 ```bash
-kubectl create secret generic migratowl-env \
+kubectl create secret generic Breakowl-env \
   --from-literal=ANTHROPIC_API_KEY=... \
-  --from-literal=MIGRATOWL_API_TOKEN="$(openssl rand -hex 32)" \
+  --from-literal=Breakowl_API_TOKEN="$(openssl rand -hex 32)" \
   --from-literal=GITHUB_TOKEN=...
 
-helm install migratowl oci://ghcr.io/bitkaio/charts/migratowl --set existingSecret=migratowl-env
-kubectl port-forward svc/migratowl 8000:8000
+helm install Breakowl oci://ghcr.io/bitkaio/charts/Breakowl --set existingSecret=Breakowl-env
+kubectl port-forward svc/Breakowl 8000:8000
 ```
 
-In the cluster there is no `kubectl` to tunnel with, so agent-sandbox mode connects to the sandbox-router Service directly (`MIGRATOWL_SANDBOX_CONNECTION_MODE=direct`, `MIGRATOWL_SANDBOX_API_URL`); the chart sets both. Options (`sandbox.mode`, `sandbox.namespace`, `persistence.*`, `env`, `resources`) are in [`values.yaml`](deploy/helm/migratowl/values.yaml). Keep the Deployment at one replica: jobs live in a SQLite file and startup reconciliation assumes a single process.
+In the cluster there is no `kubectl` to tunnel with, so agent-sandbox mode connects to the sandbox-router Service directly (`Breakowl_SANDBOX_CONNECTION_MODE=direct`, `Breakowl_SANDBOX_API_URL`); the chart sets both. Options (`sandbox.mode`, `sandbox.namespace`, `persistence.*`, `env`, `resources`) are in [`values.yaml`](deploy/helm/Breakowl/values.yaml). Keep the Deployment at one replica: jobs live in a SQLite file and startup reconciliation assumes a single process.
 
-To build the image yourself: `docker build -t migratowl-server .`
+To build the image yourself: `docker build -t Breakowl-server .`
 
 ---
 
 ## Kubernetes Setup
 
-Migratowl uses [langchain-kubernetes](https://github.com/barnakun/langchain-kubernetes) (installed from that repository's `py-0.4.3` tag) in **agent-sandbox mode** by default, which requires the [`kubernetes-sigs/agent-sandbox`](https://github.com/kubernetes-sigs/agent-sandbox) controller and CRDs installed in your cluster. This provides warm pod pools and, once you set a gVisor or Kata `runtimeClassName` in the template, kernel-level isolation.
+Breakowl uses [langchain-kubernetes](https://github.com/barnakun/langchain-kubernetes) (installed from that repository's `py-0.4.3` tag) in **agent-sandbox mode** by default, which requires the [`kubernetes-sigs/agent-sandbox`](https://github.com/kubernetes-sigs/agent-sandbox) controller and CRDs installed in your cluster. This provides warm pod pools and, once you set a gVisor or Kata `runtimeClassName` in the template, kernel-level isolation.
 
 ```bash
 # Install controller + CRDs (one-time)
@@ -685,12 +679,12 @@ kubectl apply -f k8s/sandbox-template.yaml
 kubectl apply -f k8s/warm-pool.yaml
 ```
 
-**Raw mode** — if you can't install the agent-sandbox controller (locked-down clusters, CI environments), switch to raw mode. No CRDs required — Migratowl manages ephemeral pods directly:
+**Raw mode** — if you can't install the agent-sandbox controller (locked-down clusters, CI environments), switch to raw mode. No CRDs required — Breakowl manages ephemeral pods directly:
 
 ```bash
-MIGRATOWL_SANDBOX_MODE=raw          # set in .env
-MIGRATOWL_SANDBOX_IMAGE=ghcr.io/bitkaio/migratowl-runtime:latest  # default; needs git + toolchains
-MIGRATOWL_SANDBOX_BLOCK_NETWORK=true  # requires Calico/Cilium; set false for kind (kindnet ignores NetworkPolicy)
+Breakowl_SANDBOX_MODE=raw          # set in .env
+Breakowl_SANDBOX_IMAGE=ghcr.io/bitkaio/Breakowl-runtime:latest  # default; needs git + toolchains
+Breakowl_SANDBOX_BLOCK_NETWORK=true  # requires Calico/Cilium; set false for kind (kindnet ignores NetworkPolicy)
 ```
 
 Apply the raw-mode RBAC instead of the default one, plus the sandbox egress policy:
@@ -700,7 +694,7 @@ kubectl apply -f k8s/rbac-raw.yaml
 kubectl apply -f k8s/sandbox-egress-raw.yaml
 ```
 
-With `MIGRATOWL_SANDBOX_BLOCK_NETWORK=true`, every sandbox pod gets a deny-all `NetworkPolicy`. On a CNI that enforces it, that also blocks DNS, `git clone` and package installs, so the scan can't fetch anything. `k8s/sandbox-egress-raw.yaml` re-opens DNS and HTTP/HTTPS to public addresses only. Apply it in every namespace that runs sandboxes.
+With `Breakowl_SANDBOX_BLOCK_NETWORK=true`, every sandbox pod gets a deny-all `NetworkPolicy`. On a CNI that enforces it, that also blocks DNS, `git clone` and package installs, so the scan can't fetch anything. `k8s/sandbox-egress-raw.yaml` re-opens DNS and HTTP/HTTPS to public addresses only. Apply it in every namespace that runs sandboxes.
 
 **Sandbox pod security:**
 
@@ -716,7 +710,7 @@ With `MIGRATOWL_SANDBOX_BLOCK_NETWORK=true`, every sandbox pod gets a deny-all `
 
 ## Observability
 
-Migratowl integrates with [LangFuse](https://langfuse.com) for trace-level observability. Tracing is off by default and activates when both keys are present.
+Breakowl integrates with [LangFuse](https://langfuse.com) for trace-level observability. Tracing is off by default and activates when both keys are present.
 
 ```bash
 # .env
@@ -741,7 +735,7 @@ Two ready-to-use example workflows are in [`docs/examples/`](docs/examples/). Bo
 
 ### Option A — No server needed (`ci-only.yml`)
 
-Spins up a temporary kind cluster and Migratowl instance inside the runner. Nothing to host.
+Spins up a temporary kind cluster and Breakowl instance inside the runner. Nothing to host.
 
 **Setup (2 steps):**
 
@@ -750,15 +744,15 @@ Spins up a temporary kind cluster and Migratowl instance inside the runner. Noth
 
 That's it. The built-in `GITHUB_TOKEN` is used automatically for PR comments.
 
-### Option B — Persistent Migratowl server (`with-migratowl-server.yml`)
+### Option B — Persistent Breakowl server (`with-Breakowl-server.yml`)
 
-Triggers your existing Migratowl deployment via webhook. Near-instant trigger, no cluster spin-up in CI.
+Triggers your existing Breakowl deployment via webhook. Near-instant trigger, no cluster spin-up in CI.
 
 **Setup:**
 
-1. Copy [`docs/examples/with-migratowl-server.yml`](docs/examples/with-migratowl-server.yml) into `.github/workflows/`
-2. Add a repository Actions variable `MIGRATOWL_URL` pointing at your deployment (Settings → Secrets and variables → Actions → Variables), e.g. `https://migratowl.yourcompany.com`
-3. Ensure your Migratowl instance has `GITHUB_TOKEN` set with `repo:status` and `public_repo` scopes (or `repo` for private repos)
+1. Copy [`docs/examples/with-Breakowl-server.yml`](docs/examples/with-Breakowl-server.yml) into `.github/workflows/`
+2. Add a repository Actions variable `Breakowl_URL` pointing at your deployment (Settings → Secrets and variables → Actions → Variables), e.g. `https://Breakowl.yourcompany.com`
+3. Ensure your Breakowl instance has `GITHUB_TOKEN` set with `repo:status` and `public_repo` scopes (or `repo` for private repos)
 
 **For GitLab**, change `"git_provider": "github"` to `"gitlab"` in the payload and configure:
 
@@ -767,7 +761,7 @@ GITLAB_TOKEN=glpat-...
 GITLAB_API_URL=https://gitlab.com/api/v4   # or your self-hosted URL
 ```
 
-**GitHub Enterprise Server** — set `GITHUB_API_URL` on your Migratowl instance:
+**GitHub Enterprise Server** — set `GITHUB_API_URL` on your Breakowl instance:
 
 ```bash
 GITHUB_API_URL=https://github.corp.com/api/v3
@@ -787,7 +781,7 @@ flowchart TB
 
     Pipe["Pipeline (code)<br/>clone · scan · outdated · update · validate"]
 
-    subgraph Agent["Migratowl Agent<br/>(deepagents / LangGraph)"]
+    subgraph Agent["Breakowl Agent<br/>(deepagents / LangGraph)"]
         direction TB
         Tools["Tools:<br/>• prepare_scan (runs the pipeline)<br/>• fetch_changelog<br/>• read_manifest"]
         Sub["Subagent:<br/>• package-analyzer"]
@@ -809,7 +803,7 @@ flowchart TB
 ## Project Layout
 
 ```text
-migratowl/
+Breakowl/
 ├── api/
 │   ├── main.py          # FastAPI app: /webhook, /jobs, /healthz, lifespan, auth, scan runner
 │   ├── jobs.py          # JobStore interface + in-memory store
@@ -820,7 +814,7 @@ migratowl/
 │   └── helpers.py       # extract_verdicts, assemble_report
 ├── agent/
 │   ├── graph.py         # graph singleton + sandbox lifecycle (langgraph.json entrypoint)
-│   ├── factory.py       # build_tools(), create_migratowl_agent() — builds the LangGraph
+│   ├── factory.py       # build_tools(), create_Breakowl_agent() — builds the LangGraph
 │   ├── sandbox.py       # KubernetesSandboxManager construction
 │   ├── subagents.py     # package-analyzer subagent definition
 │   ├── session_graph.py # Patches ainvoke/astream to inject LangFuse session IDs
@@ -843,8 +837,8 @@ migratowl/
 ├── models/
 │   └── schemas.py       # All Pydantic models (ScanWebhookPayload, ScanAnalysisReport, …)
 ├── pipeline.py          # Deterministic Phases 1–2, presolve, LLM brief
-├── config.py            # pydantic-settings Settings class (MIGRATOWL_ prefix)
-├── logging_setup.py     # MIGRATOWL_LOG_LEVEL and the fallback log handler
+├── config.py            # pydantic-settings Settings class (Breakowl_ prefix)
+├── logging_setup.py     # Breakowl_LOG_LEVEL and the fallback log handler
 ├── observability.py     # LangFuse CallbackHandler setup + session ID injection
 ├── registry.py          # Registry queries (PyPI, npm, crates.io, Go proxy, Maven Central)
 ├── parsers.py           # Manifest and lockfile parsers per ecosystem
@@ -852,8 +846,8 @@ migratowl/
 ├── patches.py           # Monkey-patches for third-party library bugs
 └── http.py              # Shared HTTPX async client with retry logic
 
-Dockerfile               # Server image (ghcr.io/bitkaio/migratowl-server)
-deploy/helm/migratowl/   # Helm chart for the server
+Dockerfile               # Server image (ghcr.io/bitkaio/Breakowl-server)
+deploy/helm/Breakowl/   # Helm chart for the server
 
 k8s/
 ├── rbac.yaml            # RBAC for agent-sandbox mode (manages Sandbox CRs)
@@ -865,7 +859,7 @@ k8s/
 ├── sandbox-router/      # Sandbox router image source
 └── runtime/             # Dockerfile + entrypoint for the sandbox runner image
 
-tests/                   # Mirrors migratowl/ package structure
+tests/                   # Mirrors Breakowl/ package structure
 ```
 
 ---
@@ -875,24 +869,12 @@ tests/                   # Mirrors migratowl/ package structure
 | Task | Command |
 |------|---------|
 | Install | `uv sync` |
-| Run | `uv run uvicorn migratowl.api.main:app --reload` |
+| Run | `uv run uvicorn Breakowl.api.main:app --reload` |
 | Test | `uv run pytest tests/ -v` |
-| Lint | `uv run ruff check migratowl/` |
+| Lint | `uv run ruff check Breakowl/` |
 
-**TDD is mandatory** for all production code in `migratowl/`. The Red-Green-Refactor cycle is enforced: write a failing test first, confirm RED, write minimal code to pass, confirm GREEN, then refactor. No production code without a corresponding test in `tests/`.
+**TDD is mandatory** for all production code in `Breakowl/`. The Red-Green-Refactor cycle is enforced: write a failing test first, confirm RED, write minimal code to pass, confirm GREEN, then refactor. No production code without a corresponding test in `tests/`.
 
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). All contributors must sign the [CLA](CLA.md).
-
-1. Open an issue first
-2. Branch: `issue/<NUMBER>-short-description`
-3. Write a failing test before any production code (TDD — no exceptions)
-4. Open a PR with `Closes #<NUMBER>`
-
----
 
 ## License
 
